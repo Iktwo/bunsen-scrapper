@@ -2,6 +2,7 @@
 import scrapy
 
 from bunsenscrapper.items import BunsenscrapperItem
+from scrapy.http.request import Request
 
 class BunsenSpider(scrapy.Spider):
     name = "bunsen"
@@ -18,3 +19,6 @@ class BunsenSpider(scrapy.Spider):
 		item['img'] = sel.css('.thumb-image').xpath('@data-src').extract()
 		yield item
         pass
+	next_link = response.xpath('//a[contains(text(), "Older")]/@href').extract()
+	if next_link:
+		yield Request('http://www.bunsencomics.com' + next_link[0], self.parse)
