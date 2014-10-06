@@ -14,10 +14,12 @@ class BunsenSpider(scrapy.Spider):
     def parse(self, response):
 	for sel in response.xpath('//article'):
 		item = BunsenscrapperItem()
-		item['title'] = sel.xpath('h1/a/text()').extract()
+		item['title'] = sel.xpath('h1/a[contains(text(), "Bunsen")]/text()').extract()
 		item['link'] = sel.xpath('h1/a/@href').extract()
 		item['img'] = sel.css('.thumb-image').xpath('@data-src').extract()
-		yield item
+		isLinkGood = sel.xpath('h1/a/@href').re('bunsen-\d*$')
+		if isLinkGood and item['title']:
+			yield item
         pass
 	next_link = response.xpath('//a[contains(text(), "Older")]/@href').extract()
 	if next_link:
